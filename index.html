@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Grado - Química y Biología</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .question {
+            background-color: #fff;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .question h3 {
+            margin-top: 0;
+        }
+        .options label {
+            display: block;
+            margin: 5px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Examen de Grado - Química y Biología</h1>
+<div id="quiz"></div>
+<button onclick="submitQuiz()">Enviar Respuestas</button>
+<div id="result"></div>
+
+<script>
+const questionsBank = [
+    { question: "Son considerados como la fibra más fuerte que pueda existir:", options: ["Nanotubos.", "Grafito.", "Diamante.", "Fullereno."], answer: "Nanotubos." },
+    { question: "Para formar el metano, el carbono se une a:", options: ["2 átomos de hidrógeno.", "3 átomos de hidrógeno.", "5 átomos de hidrógeno.", "4 átomos de hidrógeno."], answer: "4 átomos de hidrógeno." },
+    { question: "El número másico del carbono es:", options: ["Seis.", "Cuatro.", "Doce.", "Cinco."], answer: "Doce." },
+    { question: "El número atómico del carbono es:", options: ["Seis.", "Cuatro.", "Doce.", "Cinco."], answer: "Seis." },
+    { question: "Se forman en el interior de la tierra, bajo presiones y temperaturas muy elevadas:", options: ["Grafito.", "Fullereno.", "Nanotubos.", "Diamante."], answer: "Diamante." },
+    { question: "Como su nombre lo indica, no tiene una forma definida:", options: ["Grafito.", "Fullereno.", "Carbono amorfo.", "Diamante."], answer: "Carbono amorfo." },
+    { question: "Es un sólido de color negro, tacto suave y conductor de electricidad:", options: ["Grafito.", "Fullereno.", "Nanotubos.", "Diamante."], answer: "Grafito." },
+    { question: "Son moléculas esféricas la más común es la del carbono60:", options: ["Grafito.", "Fullereno.", "Nanotubos.", "Diamante."], answer: "Fullereno." },
+    { question: "Compuestos inorgánicos:", options: ["Son insolubles en agua.", "Son inestables al calor.", "Sus reacciones son lentas.", "Sus pesos moleculares son bajos."], answer: "Sus reacciones son lentas." },
+    { question: "Compuestos orgánicos:", options: ["Sus reacciones son sencillas.", "Son solubles en agua.", "Son insolubles en agua.", "Sus pesos moleculares son bajos."], answer: "Son insolubles en agua." },
+    { question: "Compuestos orgánicos:", options: ["Sus reacciones son lentas y complejas.", "Son solubles en agua.", "Son insolubles en solventes apolares.", "Sus pesos moleculares son bajos."], answer: "Sus reacciones son lentas y complejas." },
+    { question: "Propiedades físicas de los compuestos del carbono:", options: ["Enlaces covalentes.", "Tetravalencia.", "Solubles en disolventes orgánicos.", "Auto saturación."], answer: "Solubles en disolventes orgánicos." },
+    { question: "La fórmula que muestra todos los átomos de la molécula y algunos enlaces se denomina:", options: ["Semidesarrolloda.", "Empírica.", "Molecular.", "Desarrollada."], answer: "Semidesarrolloda." },
+    { question: "La fórmula cuyos subíndices indican el número de átomos de cada elemento en una molécula se denomina:", options: ["Empírica.", "Molecular.", "Desarrollada.", "Condensada."], answer: "Molecular." },
+    { question: "El compuesto orgánico más simple es el:", options: ["Etano.", "Propano.", "Metano.", "Butano."], answer: "Metano." },
+    { question: "Los alcanos, del metano al butano son hidrocarburos en estado:", options: ["Sólido.", "Líquido.", "Acuoso.", "Gaseoso."], answer: "Gaseoso." },
+    { question: "El alcano cuya fórmula molecular es C5H12 se denomina:", options: ["Pentano.", "Hexano.", "Nonano.", "Butano."], answer: "Pentano." },
+    { question: "Aquel átomo de carbono que está unido a dos átomos de carbono se denomina:", options: ["Carbono primario.", "Carbono secundario.", "Carbono terciario.", "Carbono cuaternario."], answer: "Carbono secundario." },
+    { question: "Aquel átomo de carbono que está unido a cuatro átomos de carbono se denomina:", options: ["Carbono primario.", "Carbono secundario.", "Carbono terciario.", "Carbono cuaternario."], answer: "Carbono cuaternario." },
+    { question: "Los restos de los seres vivos fosilizados se transforman en:", options: ["Carbón y petróleo.", "Azufre y agua.", "Calcio y alcohol.", "Silicio y germanio."], answer: "Carbón y petróleo." },
+    { question: "En el proceso de la fotosíntesis los vegetales captan:", options: ["Óxido sulfúrico SO3.", "Anhídrido nítrico N2O5.", "Monóxido de carbono CO.", "Anhídrido carbónico CO2."], answer: "Anhídrido carbónico CO2." },
+    { question: "La fórmula molecular general de los alquinos es:", options: ["CnH2n+2.", "CnH2n.", "CnHn.", "CnH3n."], answer: "CnHn." },
+    { question: "La fórmula molecular general de los alquenos es:", options: ["CnH3n.", "CnH2n.", "CnHn.", "CnH2n+2."], answer: "CnH2n." },
+    { question: "La fórmula general molecular del nonino es:", options: ["C9H9.", "C10H10.", "C8H8.", "C5H5."], answer: "C9H9." },
+    { question: "La fórmula general molecular del octeno es:", options: ["C4H10.", "C8H16.", "C6H12.", "C7H14."], answer: "C8H16." },
+    { question: "Por hidrogenación del ciclohexano se obtiene un hidrocarburo aromático denominado:", options: ["Acetileno.", "Benceno.", "Butano.", "Metano."], answer: "Benceno." },
+    { question: "El ciclotetradecano consta de:", options: ["16 carbonos.", "12 carbonos.", "14 carbonos.", "18 carbonos."], answer: "14 carbonos." },
+    { question: "El ciclohepteno consta de:", options: ["7 carbonos y 10 hidrógenos.", "8 carbonos y 16 hidrógenos.", "7 carbonos y 12 hidrógenos.", "7 carbonos y 14 hidrógenos."], answer: "7 carbonos y 12 hidrógenos." },
+    { question: "En la taiga el clima es:", options: ["Frío y húmedo.", "Templado seco.", "Seco y frío.", "Templado húmedo."], answer: "Frío y húmedo." },
+    { question: "La atmósfera:", options: ["Es el medio físico sobre el que viven las especies terrestres.", "Es la fuente de agua.", "Intercambia oxígeno, CO2 y nitrógeno con los seres vivos.", "Constituye el soporte imprescindible para las plantas."], answer: "Intercambia oxígeno, CO2 y nitrógeno con los seres vivos." },
+    { question: "La tasa de inmigración corresponde:", options: ["Al número de individuos de la población original que la abandonan.", "Al número de individuos que se incorporan a la población.", "Al total de individuos que forman parte de una población.", "Al número de individuos que nacen en un período de tiempo."], answer: "Al número de individuos que se incorporan a la población." },
+    { question: "Al número de individuos por unidad de superficie ocupada se lo denomina:", options: ["Tamaño de la población.", "Tasa de mortalidad.", "Densidad ecológica.", "Sucesión ecológica."], answer: "Densidad ecológica." },
+    { question: "La mitad de todas las especies de seres vivos habitan en:", options: ["Estepas.", "Las selvas tropicales.", "Taiga.", "Sabanas."], answer: "Las selvas tropicales." },
+    { question: "Los leopardos y leones son propios de:", options: ["Sabanas.", "Las selvas tropicales.", "Tundra.", "Taiga."], answer: "Sabanas." },
+    { question: "En las selvas tropicales las precipitaciones anuales están:", options: ["Entre los 500 y los 1600 milímetros.", "Entre los 2000 y 3000 milímetros.", "Entre los 400 y 1000 milímetros.", "Entre los 250 y 750 milímetros."], answer: "Entre los 2000 y 3000 milímetros." },
+    { question: "Son recursos renovables:", options: ["Los combustibles.", "El agua y los alimentos.", "El petróleo.", "Los minerales."], answer: "El agua y los alimentos." },
+    { question: "El aumento poblacional es más evidente en los países:", options: ["Desarrollados.", "En vías de desarrollo.", "Industrializados.", "Subdesarrollados."], answer: "En vías de desarrollo." },
+    { question: "El continente con mayor población mundial es:", options: ["América.", "Asia.", "África.", "Europa."], answer: "Asia." },
+    { question: "Los recursos más usados y los más indispensables para la vida son:", options: ["El agua.", "Los peces.", "La madera.", "La industria."], answer: "El agua." },
+    { question: "Se encarga de estudiar las relaciones entre el medioambiente y las personas:", options: ["La ecología animal.", "La ecología vegetal.", "La ecología humana.", "La antropología."], answer: "La ecología humana." },
+    { question: "Si la población es superior a los recursos disponibles, nos encontramos en una situación de:", options: ["Impacto poblacional.", "Superpoblación.", "Migración.", "Natalidad."], answer: "Superpoblación." },
+    { question: "Son las consecuencias que se dan en el medio ambiente por explotación de los recursos naturales:", options: ["Medidas preventivas.", "Medidas correctoras.", "Impacto ambiental.", "Gestión ambiental."], answer: "Impacto ambiental." },
+    { question: "Sirven para reducir los efectos negativos ocasionados:", options: ["Medidas preventivas.", "Medidas correctoras.", "Impacto ambiental.", "Gestión ambiental."], answer: "Medidas correctoras." },
+    { question: "Es el conjunto de medidas que tiene como objetivo la explotación sostenible:", options: ["Medidas preventivas.", "Medidas correctoras.", "Impacto ambiental.", "Gestión ambiental."], answer: "Gestión ambiental." },
+    { question: "Al número de individuos que se marchan hacia otro lugar se denomina:", options: ["Tasa de natalidad.", "Tasa de inmigración.", "Tasa de emigración.", "Densidad ecológica."], answer: "Tasa de emigración." },
+    { question: "La vegetación consta de praderas de plantas herbáceas, leguminosas y gramíneas:", options: ["Selvas tropicales.", "Sabanas.", "Desiertos cálidos.", "Bosques Mediterráneos."], answer: "Sabanas." },
+    { question: "Formado por bosques de coníferas están en las zonas boreales del hemisferio norte:", options: ["Selvas tropicales.", "Sabanas.", "Taiga.", "Bosques Mediterráneos."], answer: "Taiga." },
+    { question: "Se desarrolla por encima de los 70° de latitud norte:", options: ["Selvas tropicales.", "Sabanas.", "Taiga.", "Tundra."], answer: "Tundra." },
+    { question: "Son tierras áridas y erosionadas con escasa vegetación:", options: ["Selvas tropicales.", "Sabanas.", "Desiertos cálidos.", "Bosques Mediterráneos."], answer: "Desiertos cálidos." },
+    { question: "Presentan elevada humedad, del 80% y abundantes lluvias:", options: ["Selvas tropicales.", "Sabanas.", "Desiertos cálidos.", "Bosques Mediterráneos."], answer: "Selvas tropicales." },
+    { question: "Uno de los servicios ecosistémicos más relevante que nos proporciona la biodiversidad es:", options: ["La captura del CO2 del ambiente para producir aire puro.", "La alimentación.", "La medicina.", "Controla la erosión de los suelos."], answer: "La captura del CO2 del ambiente para producir aire puro." },
+    { question: "Uno de los servicios ecosistémicos más relevante que nos proporciona la biodiversidad es:", options: ["La alimentación.", "La polinización de las plantas.", "La medicina.", "Controla la erosión de los suelos."], answer: "La polinización de las plantas." },
+    { question: "La biodiversidad es máxima en:", options: ["Los desiertos.", "Las sabanas.", "Las selvas tropicales.", "La taiga."], answer: "Las selvas tropicales." },
+    { question: "El concepto de Ecología Humana, nace en una:", options: ["Escuela de New York en 1940.", "Escuela de España en 1980.", "Escuela de Chicago en 1920.", "Escuela de Ecuador en 1921."], answer: "Escuela de Chicago en 1920." },
+    { question: "La Biotecnología es la aplicación de la Ciencia y la Tecnología a sistemas:", options: ["Ecológicos.", "Biológicos.", "Morfológicos.", "Fisiológicos."], answer: "Biológicos." },
+    { question: "El primer genoma eucariota en ser secuenciado en su totalidad fue:", options: ["Echerichia coli.", "P. pastoris.", "Penicillium.", "Saccaromyces cerevisiae."], answer: "Saccaromyces cerevisiae." },
+    { question: "Fecundación externa poseen:", options: ["Los peces.", "Las aves.", "Los mamíferos.", "Los anfibios."], answer: "Los anfibios." },
+    { question: "La esclerótica y la córnea son partes constitutivas de:", options: ["El oído.", "La piel.", "La vista.", "El olfato."], answer: "La vista." },
+    { question: "El Martillo, el Yunque y el estribo son partes constitutivas de:", options: ["El oído.", "La piel.", "La vista.", "El olfato."], answer: "El oído." },
+    { question: "La parte de la neurona que contiene el núcleo y la mayor parte del citoplasma se denomina:", options: ["Dendritas.", "Axón.", "Cuerpo cavernoso.", "Cuerpo neuronal."], answer: "Cuerpo neuronal." },
+    { question: "Las ramificaciones cortas que parten del cuerpo de la neurona se denominan:", options: ["Dendritas.", "Axón.", "Cuerpo cavernoso.", "Cuerpo neuronal."], answer: "Dendritas." },
+    { question: "Las zonas donde se acumulan cuerpos neuronales se denominan:", options: ["Sustancia blanca.", "Sustancia negra.", "Sustancia gris.", "Sustancia roja."], answer: "Sustancia gris." },
+    { question: "La red que controla generalmente movimientos voluntarios de los músculos se llama:", options: ["Red nerviosa autónoma.", "Red nerviosa somática.", "Red nerviosa central.", "Red nerviosa periférica."], answer: "Red nerviosa somática." },
+    { question: "Pequeña estructura glandular, situada bajo el hipotálamo, que se divide en dos lóbulos:", options: ["Tiroides.", "Cortisol.", "Adrenalina.", "Hipófisis."], answer: "Hipófisis." },
+    { question: "Actúa en la degradación de proteínas y grasas:", options: ["Tiroides.", "Cortisol.", "Adrenalina.", "Hipófisis."], answer: "Cortisol." },
+    { question: "En esta estrategia el individuo adulto se fragmenta longitudinalmente o transversalmente, dando lugar, al menos, a dos individuos:", options: ["Escisión.", "Gemación.", "Fragmentación.", "Esporulación."], answer: "Fragmentación." },
+    { question: "Es un órgano situado debajo de la vejiga, segrega sustancias para nutrir a los espermatozoides:", options: ["Uretra.", "Próstata.", "Epidídimo.", "Ureter."], answer: "Próstata." },
+    { question: "Conducto que recorre el interior del pene, por el cual los espermatozoides salen al exterior:", options: ["Uretra.", "Próstata.", "Epidídimo.", "Ureter."], answer: "Uretra." },
+    { question: "Son seres vivos formados por una sola célula de estructura muy sencilla, llamada célula procariota:", options: ["Hongos.", "Protozoos.", "Virus.", "Bacterias."], answer: "Bacterias." },
+    { question: "Elijan la opción correcta que organiza las palabras en forma ascendente: 1. Bioma. 2. Individuo. 3. Ecosistema. 4. Comunidad. 5. Especie. 6. Población 7. Región biogeográfica 8. Biósfera.", options: ["3,4,6,7,8,1,2,5.", "2,7,4,6,5,3,8,1.", "1,2,3,4,5,6,7,8.", "2,5,6,4,3,1,7,8."], answer: "2,5,6,4,3,1,7,8." },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-etil-5metil-hexano", "4-etil-2 metil-hexano", "2,4-dietil-pentano", "4, 7-dietil-2,8-dimetil-decano"], answer: "4-etil-2 metil-hexano" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-etil-5metil-heptano", "4-etil-2 metil-hexano", "3,5-dimetil-heptano", "4, 7-dietil-2,8-dimetil-decano"], answer: "3,5-dimetil-heptano" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-etil-5metil-hexano", "4-etil-2 metil-hexano", "2,4-dietil-pentano", "4, 7-dietil-2,8-dimetil-decano"], answer: "4, 7-dietil-2,8-dimetil-decano" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-etil-5metil-hexano.", "4-etil-2 metil-hexano.", "3-etil-2-metil-4-propilheptano.", "2,4-dietil-5-propilhexano"], answer: "3-etil-2-metil-4-propilheptano." },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-metil-hexano.", "4-etil-2 metil-hexano.", "3-etil-2-metil-heptano.", "2,4-dietil-5-propilhexano"], answer: "3-etil-2-metil-heptano." },
+    { question: "El nombre del siguiente compuesto es:", options: ["Ciclobutano", "Ciclohexano", "Ciclopentano", "Ciclohexino"], answer: "Ciclohexano" },
+    { question: "El nombre del siguiente compuesto es:", options: ["1-metil-2,4-dietilciclopropano", "2-etil-3,4-dimetilciclohexano", "3-etil-5,6-dimetilciclopentano", "1-etil-2,4-dimetilciclohexano"], answer: "1-etil-2,4-dimetilciclohexano" },
+    { question: "El nombre del siguiente compuesto es:", options: ["Ciclobutano", "Ciclohexano", "Ciclopentano.", "Ciclohexino"], answer: "Ciclopentano." },
+    { question: "El nombre del siguiente compuesto es:", options: ["3,5-dimetil-ciclohexeno", "1-metil-2,4-dietilciclopropano", "2-etil-3,4-dimetilciclohexeno", "3-etil-5,6-dimetilciclopenteno"], answer: "2-etil-3,4-dimetilciclohexeno" },
+    { question: "El nombre del siguiente compuesto es:", options: ["Ciclobuteno.", "Ciclobutino.", "Ciclopenteno", "Ciclopentino"], answer: "Ciclopenteno" },
+    { question: "El nombre del siguiente compuesto es:", options: ["4-metil-2-bromo-ciclobutino", "2-etil-5-bromo-ciclobuteno", "3-bromo-5-metil-ciclopentino.", "3-bromo-4-etil-ciclopentino"], answer: "3-bromo-5-metil-ciclopentino." },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-etil-5-metil-2-hexeno", "2,4-dimetil-1-penteno", "4-etil-5-metil-2-hexino", "5-etil-2,7-dimetil,3-octino"], answer: "3-etil-5-metil-2-hexeno" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-etil-5-metil-2-hexeno", "2,4-dimetil-1-penteno", "4-etil-5-metil-2-hexino", "5-etil-2,7-dimetil,3-octino"], answer: "4-etil-5-metil-2-hexino" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-etil-5-metil-2-hexino", "2,4-dimetil-1-penteno", "4-etil-5-metil-2-hexino", "5-etil-2,7-dimetil,3-octino"], answer: "5-etil-2,7-dimetil,3-octino" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-etil-5-metil-2-octino", "2,4-dimetil-1-penteno", "4-etil-5-metil-2-hexino", "5-etil-2,7-dimetil,3-octino"], answer: "3-etil-5-metil-2-octino" },
+    { question: "El nombre del siguiente compuesto es:", options: ["5-etil-4-metil-4-noneno", "2,4-dimetil-1-penteno", "4-etil-5-metil-2-hexino", "5-etil-2,7-dimetil,3-octino"], answer: "5-etil-4-metil-4-noneno" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3,6-dietil-2,8-dimetil-4-nonino", "2,4-dimetil-4-penteno", "4-etil-5-metil-4-hexino", "5-etil-2,7-dimetil,3-nonino"], answer: "3,6-dietil-2,8-dimetil-4-nonino" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3,6-dietil-2,8-dimetil-4-octino", "2,3,6,7-tetrametil-4-octino", "4-etil-5-metil-4-hexino", "3,4,5,6,-dimetil,3-octino"], answer: "2,3,6,7-tetrametil-4-octino" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3,6-dietil-2,8-dimetil-4-octeno", "2,3,6,7-tetrametil-4-octeno", "4-etil-5-metil-4-hexino", "3,4,dietil-5,6,-dimetil,2-hepteno"], answer: "2,3,6,7-tetrametil-4-octeno" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3,6-dietil-8 propil-3,5-dimetil-4-deceno", "2,3,6,7-tetrametil-4-octeno", "4-etil-2,8-dimetil- 5-propil- 4-deceno", "3,4,dietil-2,8,-dimetil,2-octeno"], answer: "4-etil-2,8-dimetil- 5-propil- 4-deceno" },
+    { question: "El nombre del siguiente compuesto es:", options: ["4,5-dietil-2,7,8,9-tetrametil-4-deceno", "2,3,6,7-tetrametil-4-octeno", "4-etil-2,8-dimetil- 5-propil- 4-deceno", "3,4,dietil-2,8,-dimetil,2-octeno"], answer: "4,5-dietil-2,7,8,9-tetrametil-4-deceno" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3,6-dietil-2,8-dimetil-4-octeno", "2,3,6,7-tetrametil-4-octeno", "4-etil-5-metil-4-hexino", "3,4,7-trietil-2,5,6,8-tetrametil,2-noneno"], answer: "3,4,7-trietil-2,5,6,8-tetrametil,2-noneno" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-etil-4-metil-4-noneno", "3,5-dietil-4,6,7,8-tetrametil-4-noneno", "4-etil-5-metil-2-hexino", "3-etil-2,7-dimetil,3-octino"], answer: "3,5-dietil-4,6,7,8-tetrametil-4-noneno" },
+    { question: "El nombre del siguiente compuesto es:", options: ["3-metil-hexano.", "4-etil-2 metil-hexano.", "3-etil-4-metil-hexano.", "2,4-dietil-5-propilhexano"], answer: "3-etil-4-metil-hexano." },
+    { question: "El nombre del siguiente compuesto es:", options: ["4-etil-2,3-dimetil-hexano.", "4-etil-2 metil-hexano.", "3-etil-4-metil-hexano.", "2,4-dietil-5-propilhexano"], answer: "4-etil-2,3-dimetil-hexano." },
+    { question: "El nombre del siguiente compuesto es:", options: ["4-etil-2,3-dimetil-heptano.", "4-etil-2 metil-hexano.", "4-etil-2,3,5-trimetil-heptano.", "2,4-dietil-5-propilhexano"], answer: "4-etil-2,3,5-trimetil-heptano." }
+];
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function generateQuiz() {
+    const selectedQuestions = questionsBank.slice();
+    shuffle(selectedQuestions);
+    const quizContainer = document.getElementById('quiz');
+    quizContainer.innerHTML = '';
+    for (let i = 0; i < 30; i++) {
+        const qDiv = document.createElement('div');
+        qDiv.className = 'question';
+        qDiv.innerHTML = `<h3>${i + 1}. ${selectedQuestions[i].question}</h3>`;
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'options';
+        selectedQuestions[i].options.forEach((opt, index) => {
+            optionsDiv.innerHTML += `<label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label>`;
+        });
+        qDiv.appendChild(optionsDiv);
+        quizContainer.appendChild(qDiv);
+    }
+}
+
+function submitQuiz() {
+    let score = 0;
+    const quizContainer = document.getElementById('quiz');
+    const questions = quizContainer.getElementsByClassName('question');
+    for (let i = 0; i < questions.length; i++) {
+        const selectedOption = questions[i].querySelector(`input[name="q${i}"]:checked`);
+        if (selectedOption && selectedOption.value === questionsBank[i].answer) {
+            score++;
+        }
+    }
+    document.getElementById('result').innerText = `Tu puntuación es: ${score}/30`;
+}
+
+window.onload = generateQuiz;
+</script>
+
+</body>
+</html>
